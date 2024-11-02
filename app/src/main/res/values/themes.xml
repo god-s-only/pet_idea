@@ -1,0 +1,20 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.PetIdea" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">@color/buttonColor</item>
+        <!-- Secondary color (affects button tint) -->
+        <item name="colorPrimaryVariant">@color/buttonColor</item>z
+    </style>
+
+    <style name="thebackground">
+        <item name="android:backgroundTint">@color/white</item>
+    </style>
+
+    <style name="thebackgroundfor">
+        <item name="android:background">@drawable/background_signin</item>
+    </style>
+
+    <style name="Theme.PetIdea" parent="Base.Theme.PetIdea" />
+</resources>
