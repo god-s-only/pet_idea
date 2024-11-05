@@ -24,6 +24,8 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -38,11 +40,13 @@ import java.util.List;
 public class Repository {
     private FirebaseAuth mAuth;
     private DocumentReference documentReference;
+    private CollectionReference collectionReference;
 
     public Repository(){
         this.mAuth = FirebaseAuth.getInstance();
         if (mAuth.getCurrentUser() != null) {
             documentReference = FirebaseFirestore.getInstance().collection(mAuth.getCurrentUser().getUid()).document();
+            collectionReference = FirebaseFirestore.getInstance().collection(mAuth.getCurrentUser().getUid());
         }
     }
 
@@ -179,6 +183,46 @@ public class Repository {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Toast.makeText(context, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        return mutableLiveData;
+    }
+    public void updateUserInformation(String username,
+                                      Uri profilePictureUri,
+                                      String bio,
+                                      String profilePictureUrl,
+                                      Context context){
+        documentReference.update("username", username);
+        documentReference.update("profilePictureUri", profilePictureUri).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Toast.makeText(context, "Updated Successfully", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(context, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        documentReference.update("bio", bio);
+        documentReference.update("profilePictureUrl", profilePictureUrl);
+    }
+    public LiveData<List<ProfileModel>> adminPanelGetAllUsersInfo(Context context){
+        ArrayList<ProfileModel> profileModelArrayList = new ArrayList<>();
+        MutableLiveData<List<ProfileModel>> mutableLiveData = new MutableLiveData<>();
+        collectionReference.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                for(QueryDocumentSnapshot snapshot: queryDocumentSnapshots){
+                    ProfileModel profileModel = snapshot.toObject(ProfileModel.class);
+                    profileModelArrayList.add(profileModel);
+                    mutableLiveData.postValue(profileModelArrayList);
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(context, "Sorry master, we could not get all users information, the problem is because of "+e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
         return mutableLiveData;
