@@ -1,10 +1,12 @@
 package com.mankind.petidea.model;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -32,6 +34,7 @@ import com.google.firebase.storage.UploadTask;
 import com.mankind.petidea.activities.HomeActivity;
 import com.mankind.petidea.activities.ProfileActivity;
 import com.mankind.petidea.activities.SignIn;
+import com.mankind.petidea.activities.SignUp;
 import com.mankind.petidea.spinkit.SpinKitLoader;
 
 import java.util.ArrayList;
@@ -41,12 +44,14 @@ public class Repository {
     private FirebaseAuth mAuth;
     private DocumentReference documentReference;
     private CollectionReference collectionReference;
+    private DocumentReference animalReference;
 
     public Repository(){
         this.mAuth = FirebaseAuth.getInstance();
         if (mAuth.getCurrentUser() != null) {
             documentReference = FirebaseFirestore.getInstance().collection(mAuth.getCurrentUser().getUid()).document();
             collectionReference = FirebaseFirestore.getInstance().collection(mAuth.getCurrentUser().getUid());
+            animalReference = FirebaseFirestore.getInstance().collection(mAuth.getCurrentUser().getUid()).document(mAuth.getCurrentUser().getUid()).collection(mAuth.getCurrentUser().getUid()).document(mAuth.getCurrentUser().getUid());
         }
     }
 
@@ -71,6 +76,9 @@ public class Repository {
                                     if(task.isSuccessful()){
                                         spinKitLoader.dismissDialog();
                                         Toast.makeText(context, "Email not verified, please check your email", Toast.LENGTH_LONG).show();
+                                        if (context instanceof Activity) {
+                                            ((Activity) context).finish();
+                                        }
                                     }
                                 }
                             }).addOnFailureListener(new OnFailureListener() {
@@ -109,6 +117,9 @@ public class Repository {
                                             Intent.FLAG_ACTIVITY_NEW_TASK
                                     ));
                                     Toast.makeText(context, "Please check your email for verification", Toast.LENGTH_LONG).show();
+                                    if (context instanceof Activity) {
+                                        ((Activity) context).finish();
+                                    }
                                 }
                             }
                         }).addOnFailureListener(new OnFailureListener() {
@@ -149,10 +160,12 @@ public class Repository {
         }
     }
     public void signInAnonymously(Context context){
+
         mAuth.signInAnonymously().addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
+
                     context.startActivity(new Intent(context, ProfileActivity.class).addFlags(
                             Intent.FLAG_ACTIVITY_NEW_TASK
                     ));
@@ -226,5 +239,94 @@ public class Repository {
             }
         });
         return mutableLiveData;
+    }
+    public void addUserInformation(String username, Uri profilePictureUri, String bio, String profilePictureUrl, Context context) {
+        if (context == null) {
+            Log.e("addUserInformation", "Context is null");
+            return;
+        }
+
+        // Initialize SpinKitLoader and show loading dialog
+        SpinKitLoader spinKitLoader = new SpinKitLoader(context);
+        spinKitLoader.showDialog();
+        if (documentReference == null) {
+            Log.e("addUserInformation", "Document reference is null. Initialization required.");
+            spinKitLoader.dismissDialog();
+            Toast.makeText(context, "Failed to add information: database reference error.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        ProfileModel profileModel = new ProfileModel(username, profilePictureUri, bio, profilePictureUrl);
+        documentReference.set(profileModel)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        spinKitLoader.dismissDialog();
+                        Toast.makeText(context, "Information added successfully", Toast.LENGTH_SHORT).show();
+                        if (context instanceof Activity) {
+                            context.startActivity(new Intent(context, HomeActivity.class));
+                            ((Activity) context).finish();
+                        } else {
+                            Log.e("addUserInformation", "Invalid context type for starting HomeActivity");
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        spinKitLoader.dismissDialog();
+                        Log.e("addUserInformation", "Failed to add user information: " + e.getMessage(), e);
+                        Toast.makeText(context, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    public void deleteUser(Context context){
+        mAuth.getCurrentUser().delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    documentReference.delete();
+                    context.startActivity(new Intent(context, SignUp.class));
+                    Toast.makeText(context, "Account deleted successfully", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(context, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    public void addAnimalInformation(Uri animalProfileUri, String animalProfilePictureUrl, String animalBreed, Context context){
+        AnimalModel animalModel = new AnimalModel(animalProfileUri, animalProfilePictureUrl, animalBreed);
+        animalReference.set(animalModel).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Toast.makeText(context, "Information added successfully", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(context, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    public LiveData<List<AnimalModel>> getAnimalInformation(Context context){
+        ArrayList<AnimalModel> animalModelArrayList = new ArrayList<>();
+        MutableLiveData<List<AnimalModel>> listMutableLiveData = new MutableLiveData<>();
+        animalReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                AnimalModel animalModel = documentSnapshot.toObject(AnimalModel.class);
+                animalModelArrayList.add(animalModel);
+                listMutableLiveData.postValue(animalModelArrayList);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(context, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        return listMutableLiveData;
     }
 }

@@ -16,6 +16,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -30,16 +31,16 @@ import com.google.firebase.storage.UploadTask;
 import com.mankind.petidea.R;
 import com.mankind.petidea.databinding.ActivityProfileBinding;
 import com.mankind.petidea.model.ProfileModel;
+import com.mankind.petidea.viewmodel.ViewModel;
 
 public class ProfileActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
-    ActivityProfileBinding binding;
-    private FirebaseFirestore firestore;
-    private CollectionReference collectionReference;
-    private DocumentReference documentReference;
-    ActivityResultLauncher profilePhoto;
-    private StorageReference storageReference;
+    ActivityResultLauncher takePhoto;
     Uri profilePictureUri;
+    StorageReference storageReference;
+    ActivityProfileBinding binding;
+    private ViewModel viewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,80 +52,63 @@ public class ProfileActivity extends AppCompatActivity {
             return insets;
         });
         binding = DataBindingUtil.setContentView(this, R.layout.activity_profile);
+        viewModel = new ViewModelProvider(this).get(ViewModel.class);
         mAuth = FirebaseAuth.getInstance();
         storageReference = FirebaseStorage.getInstance().getReference();
-        profilePhoto = registerForActivityResult(new ActivityResultContracts.GetContent(),
+        takePhoto = registerForActivityResult(new ActivityResultContracts.GetContent(),
                 new ActivityResultCallback<Uri>() {
                     @Override
                     public void onActivityResult(Uri o) {
-                        if (o != null) {
-                            binding.profilePicture.setImageURI(o);
-                            profilePictureUri = o;
-                        }
+                        binding.profileImage.setImageURI(o);
+                        profilePictureUri = o;
                     }
                 });
-        binding.profilePicture.setOnClickListener(new View.OnClickListener() {
+        binding.profileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                profilePhoto.launch("image/*");
+                takePhoto.launch("image/*");
             }
         });
-        firestore = FirebaseFirestore.getInstance();
-        if (mAuth.getCurrentUser() != null) {
-            collectionReference = firestore.collection(mAuth.getCurrentUser().getUid());
-            documentReference = firestore.collection(mAuth.getCurrentUser().getUid()).document();
-        }
-
-        binding.submitBtn.setOnClickListener(new View.OnClickListener() {
+        binding.saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String username = binding.usernameEditText.getText().toString().trim();
-                String bio = binding.bioEditText.getText().toString().trim();
+                String username = binding.username.getText().toString().trim();
+                String bio = binding.bio.getText().toString().trim();
                 if(!TextUtils.isEmpty(username) && !TextUtils.isEmpty(bio)){
-                    if(profilePictureUri != null){
-                        StorageReference filePath = storageReference.child("user_profile_pictures")
-                                .child("image"+ Timestamp.now().getSeconds());
+                    if (profilePictureUri != null) {
+                        StorageReference filePath = storageReference.child("users_profile_picture")
+                                .child(""+Timestamp.now().getSeconds());
                         filePath.putFile(profilePictureUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                             @Override
                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                                 filePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                     @Override
                                     public void onSuccess(Uri uri) {
-                                        String profilePicturePath = uri.toString();
-                                        ProfileModel profileModel = new ProfileModel(username, profilePictureUri, bio, profilePicturePath);
-                                        documentReference.set(profileModel).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void unused) {
-                                                Toast.makeText(ProfileActivity.this, "Information added successfully", Toast.LENGTH_LONG).show();
-                                            }
-                                        }).addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                Toast.makeText(ProfileActivity.this, ""+e.getMessage(), Toast.LENGTH_LONG).show();
-                                            }
-                                        });
+                                        String profilePictureUrl = uri.toString();
+                                        viewModel.addUserInformation(username, profilePictureUri, bio, profilePictureUrl, ProfileActivity.this);
+                                        binding.bio.getText().clear();
+                                        binding.username.getText().clear();
                                     }
                                 }).addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(ProfileActivity.this, ""+e.getMessage(), Toast.LENGTH_LONG).show();
+                                        Toast.makeText(ProfileActivity.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
                                     }
                                 });
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(ProfileActivity.this, ""+e.getMessage(), Toast.LENGTH_LONG).show();
+                                Toast.makeText(ProfileActivity.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                         });
                     }else{
-                        Toast.makeText(ProfileActivity.this, "Please select an image", Toast.LENGTH_LONG).show();
+                        Toast.makeText(ProfileActivity.this, "Please select an image", Toast.LENGTH_SHORT).show();
                     }
                 }else{
-                    Toast.makeText(ProfileActivity.this, "Please fill the above fields", Toast.LENGTH_LONG).show();
+                    Toast.makeText(ProfileActivity.this, "Please fill in the above fields", Toast.LENGTH_SHORT).show();
                 }
             }
         });
     }
-
 }

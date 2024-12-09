@@ -5,7 +5,7 @@
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
         <item name="colorPrimary">@color/buttonColor</item>
         <!-- Secondary color (affects button tint) -->
-        <item name="colorPrimaryVariant">@color/buttonColor</item>z
+        <item name="colorPrimaryVariant">@color/buttonColor</item>
     </style>
 
     <style name="thebackground">
@@ -14,6 +14,10 @@
 
     <style name="thebackgroundfor">
         <item name="android:background">@drawable/background_signin</item>
+    </style>
+
+    <style name="thesubmitbackground">
+        <item name="android:backgroundTint">@color/black</item>
     </style>
 
     <style name="Theme.PetIdea" parent="Base.Theme.PetIdea" />

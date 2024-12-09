@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     id("com.google.gms.google-services")
+    alias(libs.plugins.jetbrains.kotlin.android)
 }
 
 android {
@@ -33,6 +34,9 @@ android {
     buildFeatures{
         dataBinding = true
     }
+    kotlinOptions {
+        jvmTarget = "17"
+    }
 }
 
 dependencies {
@@ -53,6 +57,7 @@ dependencies {
 
     //Glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation(libs.core.ktx)
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
 
     //Navigation
@@ -68,6 +73,9 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
     // LiveData
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
+
+    //Circle imageview
+    implementation("de.hdodenhof:circleimageview:3.1.0")
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)

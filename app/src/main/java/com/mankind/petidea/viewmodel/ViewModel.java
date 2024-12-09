@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
+import com.mankind.petidea.model.AnimalModel;
 import com.mankind.petidea.model.ProfileModel;
 import com.mankind.petidea.model.Repository;
 
@@ -38,5 +39,21 @@ public class ViewModel extends AndroidViewModel {
     }
     public LiveData<List<ProfileModel>> getUserInformation(Context context){
         return repository.getUserInformation(context);
+    }
+    public void addUserInformation(String username, Uri profilePictureUri, String bio, String profilePictureUrl, Context context){
+        repository.addUserInformation(username, profilePictureUri, bio, profilePictureUrl, context);
+    }
+    public void updateUserInformation(String username,
+                                      Uri profilePictureUri,
+                                      String bio,
+                                      String profilePictureUrl,
+                                      Context context){
+        repository.updateUserInformation(username, profilePictureUri, bio, profilePictureUrl, context);
+    }
+    public void addAnimalInformation(Uri animalProfileUri, String animalProfilePictureUrl, String animalBreed, Context context){
+        repository.addAnimalInformation(animalProfileUri, animalProfilePictureUrl, animalBreed, context);
+    }
+    public LiveData<List<AnimalModel>> getAnimalInformation(Context context){
+        return repository.getAnimalInformation(context);
     }
 }

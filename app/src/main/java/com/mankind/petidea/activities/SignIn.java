@@ -2,6 +2,7 @@ package com.mankind.petidea.activities;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -16,6 +17,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.mankind.petidea.R;
+import com.mankind.petidea.broadcast.BroadCastReceiver;
 import com.mankind.petidea.databinding.ActivitySignInBinding;
 import com.mankind.petidea.viewmodel.ViewModel;
 
@@ -33,6 +35,11 @@ public class SignIn extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        BroadCastReceiver broadCastReceiver = new BroadCastReceiver();
+        IntentFilter intentFilter = new IntentFilter("android.intent.action.AIRPLANE_MODE");
+        registerReceiver(broadCastReceiver, intentFilter);
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_sign_in);
         viewModel = new ViewModelProvider(this).get(ViewModel.class);
         binding.loginBtn.setOnClickListener(new View.OnClickListener() {
@@ -42,7 +49,6 @@ public class SignIn extends AppCompatActivity {
                 String password = binding.loginPassword.getText().toString().trim();
                 if (!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
                     viewModel.signInUser(email, password, SignIn.this);
-                    finish();
                     binding.loginEmail.getText().clear();
                     binding.loginPassword.getText().clear();
                 }else{

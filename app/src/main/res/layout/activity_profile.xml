@@ -10,51 +10,122 @@
         android:layout_height="match_parent"
         tools:context=".activities.ProfileActivity">
 
-        <ImageView
-            android:id="@+id/profilePicture"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginTop="64dp"
-            android:layout_marginBottom="124dp"
-            android:background="@drawable/background_image_placeholder"
-            android:src="@drawable/baseline_image_24"
-            app:layout_constraintBottom_toTopOf="@+id/usernameEditText"
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_marginTop="40dp"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/textView6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawableStart="@drawable/background_profile_text"
+                    android:drawablePadding="10dp"
+                    android:fontFamily="@font/baloo_regular"
+                    android:text="Profile"
+                    android:textColor="@color/black"
+                    android:textSize="20sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
+                <ImageView
+                    android:id="@+id/imageView"
+                    android:layout_width="100dp"
+                    android:layout_height="70dp"
+                    android:layout_marginStart="92dp"
+                    android:alpha="0.2"
+                    android:src="@drawable/cloud_image"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="@+id/textView6"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.0" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="2dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="34dp"
+                    android:background="@drawable/background_profile_text"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/imageView"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
+
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profileImage"
+            android:layout_width="0dp"
+            android:layout_height="150dp"
+            android:layout_marginStart="124dp"
+            android:layout_marginTop="36dp"
+            android:layout_marginEnd="124dp"
+            android:alpha="0.3"
+            android:background="@drawable/background_profile_login_picture"
+            app:civ_border_color="#FF000000"
+            app:civ_border_width="2dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
         <EditText
-            android:id="@+id/usernameEditText"
-            android:layout_width="0dp"
+            android:id="@+id/username"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="63dp"
+            android:layout_marginStart="101dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginEnd="101dp"
+            android:fontFamily="@font/baloo_regular"
+            android:gravity="center"
             android:hint="Username"
-            app:layout_constraintBottom_toTopOf="@+id/bioEditText"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/profilePicture" />
+            app:layout_constraintTop_toBottomOf="@+id/profileImage" />
+
 
         <EditText
-            android:id="@+id/bioEditText"
+            android:id="@+id/bio"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="65dp"
-            android:hint="Bio"
-            app:layout_constraintBottom_toTopOf="@+id/submitBtn"
+            android:layout_height="88sp"
+            android:layout_marginStart="70dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginEnd="70dp"
+            android:background="@drawable/background_bio_text"
+            android:fontFamily="@font/baloo_regular"
+            android:gravity="center"
+            android:hint="Tell us about your pet or \n yourself"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/usernameEditText" />
+            app:layout_constraintTop_toBottomOf="@+id/username" />
+
 
         <Button
-            android:id="@+id/submitBtn"
-            android:layout_width="wrap_content"
+            android:id="@+id/saveBtn"
+            style="@style/thesubmitbackground"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="393dp"
-            android:text="Submit"
+            android:layout_marginStart="126dp"
+            android:layout_marginEnd="126dp"
+            android:layout_marginBottom="100dp"
+            android:fontFamily="@font/baloo_regular"
+            android:text="Save"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/bioEditText" />
+            app:layout_constraintStart_toStartOf="parent" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -2,6 +2,7 @@ package com.mankind.petidea.activities;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -24,6 +25,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.mankind.petidea.R;
+import com.mankind.petidea.broadcast.BroadCastReceiver;
 import com.mankind.petidea.databinding.ActivitySignUpBinding;
 import com.mankind.petidea.viewmodel.ViewModel;
 
@@ -38,6 +40,10 @@ public class SignUp extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_sign_up);
         viewModel = new ViewModelProvider(this).get(ViewModel.class);
 
+        BroadCastReceiver broadCastReceiver = new BroadCastReceiver();
+        IntentFilter intentFilter = new IntentFilter("android.intent.action.AIRPLANE_MODE");
+        registerReceiver(broadCastReceiver, intentFilter);
+
         binding.signUpBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -47,7 +53,6 @@ public class SignUp extends AppCompatActivity {
                 if (!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password) && !TextUtils.isEmpty(confirmPassword)) {
                     if (password.equals(confirmPassword)) {
                         viewModel.signUpUser(email, password, SignUp.this);
-                        finish();
                         binding.signUpEmail.getText().clear();
                         binding.signUpPassword.getText().clear();
                         binding.signUpConfirmPassword.getText().clear();
