@@ -2,6 +2,7 @@ package com.mankind.petidea.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -31,7 +32,7 @@ class ForgotPasswordActivity : AppCompatActivity() {
 
         mAuth = FirebaseAuth.getInstance()
         binding = DataBindingUtil.setContentView(this, R.layout.activity_forgot_password)
-        binding.forgotBtn.setOnClickListener { v ->
+        binding.forgotBtn.setOnClickListener {
             val spinkit = SpinKitLoader(applicationContext)
             spinkit.showDialog()
             mAuth.sendPasswordResetEmail(binding.forgotPasswordEmail.text.toString().trim()).addOnCompleteListener { task ->
@@ -40,10 +41,15 @@ class ForgotPasswordActivity : AppCompatActivity() {
                     Toast.makeText(applicationContext, "Please check your email for password reset email", Toast.LENGTH_LONG).show()
                     startActivity(Intent(applicationContext, SignIn::class.java))
                 }
-            }.addOnFailureListener { e ->
+            }.addOnFailureListener {
                 spinkit.dismissDialog()
-                Toast.makeText(applicationContext, e.message, Toast.LENGTH_LONG).show()
+                Toast.makeText(applicationContext, it.message, Toast.LENGTH_LONG).show()
             }
         }
+        binding.backButton.setOnClickListener{
+            onBackPressedDispatcher.onBackPressed()
+        }
+
     }
+
 }

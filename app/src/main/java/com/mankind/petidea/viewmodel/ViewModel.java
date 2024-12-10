@@ -50,8 +50,8 @@ public class ViewModel extends AndroidViewModel {
                                       Context context){
         repository.updateUserInformation(username, profilePictureUri, bio, profilePictureUrl, context);
     }
-    public void addAnimalInformation(Uri animalProfileUri, String animalProfilePictureUrl, String animalBreed, Context context){
-        repository.addAnimalInformation(animalProfileUri, animalProfilePictureUrl, animalBreed, context);
+    public void addAnimalInformation(String animalname,Uri animalProfileUri, String animalProfilePictureUrl, String animalBreed,String animalInformation ,Context context){
+        repository.addAnimalInformation(animalname,animalProfileUri, animalProfilePictureUrl, animalBreed,animalInformation ,context);
     }
     public LiveData<List<AnimalModel>> getAnimalInformation(Context context){
         return repository.getAnimalInformation(context);

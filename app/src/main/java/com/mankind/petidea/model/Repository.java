@@ -246,7 +246,6 @@ public class Repository {
             return;
         }
 
-        // Initialize SpinKitLoader and show loading dialog
         SpinKitLoader spinKitLoader = new SpinKitLoader(context);
         spinKitLoader.showDialog();
         if (documentReference == null) {
@@ -297,20 +296,7 @@ public class Repository {
             }
         });
     }
-    public void addAnimalInformation(Uri animalProfileUri, String animalProfilePictureUrl, String animalBreed, Context context){
-        AnimalModel animalModel = new AnimalModel(animalProfileUri, animalProfilePictureUrl, animalBreed);
-        animalReference.set(animalModel).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void unused) {
-                Toast.makeText(context, "Information added successfully", Toast.LENGTH_SHORT).show();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(context, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
+
     public LiveData<List<AnimalModel>> getAnimalInformation(Context context){
         ArrayList<AnimalModel> animalModelArrayList = new ArrayList<>();
         MutableLiveData<List<AnimalModel>> listMutableLiveData = new MutableLiveData<>();
@@ -328,5 +314,27 @@ public class Repository {
             }
         });
         return listMutableLiveData;
+    }
+    public void addAnimalInformation(String animalName,Uri animalProfileUri, String animalProfilePictureUrl, String animalBreed, String animalInformation, Context context){
+        SpinKitLoader spinKitLoader = new SpinKitLoader(context);
+        spinKitLoader.showDialog();
+        AnimalModel animalModel = new AnimalModel(animalName,animalProfileUri, animalProfilePictureUrl, animalBreed, animalInformation);
+        animalReference.set(animalModel).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Toast.makeText(context, "Information Added Successfully", Toast.LENGTH_SHORT).show();
+                context.startActivity(new Intent(context, HomeActivity.class));
+                spinKitLoader.dismissDialog();
+                if (context instanceof Activity) {
+                    ((Activity) context).finish();
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(context, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+                spinKitLoader.dismissDialog();
+            }
+        });
     }
 }
